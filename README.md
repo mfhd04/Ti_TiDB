@@ -1,13 +1,15 @@
 # MT_TiDB
 DBA Operation And Maintenance Tool For TiDB Database
 
-1. 工具使用简介
-1.1 配置别名 - [具体路径基于实际情况进行修改]
- alias vi='vim'
- alias vimt='vi /nas/vm_workdir/MT_TiDB'
- alias mt='/nas/vm_workdir/MT_TiDB'
 
-1.2 设置数据库连接
+# 1. 工具使用简介
+## 1.1 配置别名 - [具体路径基于实际情况进行修改]
+
+alias vi='vim'  
+alias vimt='vi /nas/vm_workdir/MT_TiDB'  
+alias mt='/nas/vm_workdir/MT_TiDB'  
+
+## 1.2 设置数据库连接
   MT_TiDB为一个shell脚本，直接编辑修改，修改开始部分的数据库连接信息
 简单加密逻辑：
 如明文密码为'root'
@@ -17,22 +19,22 @@ cm9vdA==
 [root@vm172-16-201-85 ~]# 
 
 cm9vdA== 替换MYPASS中的"cjAwdEAxMzE0"即可
-<img width="464" alt="image" src="https://github.com/mfhd04/MT_TiDB/assets/68178811/4fe5ae76-87a1-47d7-a802-b22ad0042e87">
+![image](https://github.com/mfhd04/MT_TiDB/assets/68178811/3dad52f0-36c6-4bdc-ab41-31e25cf0b23c)
 
 
-1.3 验证配置
+## 1.3 验证配置
  修改相关必要变量后，通过如下命令验证工具和数据库集群连通性。
  $ mt test
 <img width="567" alt="image" src="https://github.com/mfhd04/MT_TiDB/assets/68178811/f7ad15a8-3ada-4ed9-be23-7605b11a8ffd">
 
      
-1.4 特别说明：
+## 1.4 特别说明：
   - 部分菜单功能需要基于tiup环境才可以正常使用，建议该工具部署在可以直接调用tiup命令的用户下，如tidb用户
 
 
-2. 功能明细
-2.1 工具菜单
-
+# 2. 功能明细
+## 2.1 工具菜单
+```
 [tidb@tidb-server tidb]$ mt
 
   Usage: mt <command> [<arguments>]
@@ -131,12 +133,12 @@ cm9vdA== 替换MYPASS中的"cjAwdEAxMzE0"即可
     - Set environment variable tit_TMP to the default temp directory (default if /tmp when not set)
     - Common abbreviations, beginning with g(global), e(exactly), ms(master slave), ending with g(\G Display in columns)
 
+```
 
 
-
-2.2 功能演示
-2.2.1 基本信息
-
+## 2.2 功能演示
+### 2.2.1 基本信息
+```
 [tidb@tidb-server tidb]$ mt basic
 +---------------------+--------------------+
 | SYSDATE()           | version()          |
@@ -238,11 +240,13 @@ Threads: 0  Questions: 0  Slow queries: 0  Opens: 0  Flush tables: 0  Open table
 | zone   | ["sh"]                                                                         |
 +--------+--------------------------------------------------------------------------------+
 [tidb@tidb-server tidb]$ 
+```
+### 2.2.2 用户信息
+![image](https://github.com/mfhd04/MT_TiDB/assets/68178811/811298da-96c9-4363-aac6-f034a66f08b6)
 
-2.2.2 用户信息
-[图片]
 
-2.2.3 Tikv top cpu
+### 2.2.3 Tikv top cpu
+```
 [tidb@tidb-server tidb]$ mt top_tikv_cpu_sql
 请输入开始时间（留空则默认为半小时前:2024-05-05 17:05:21）: 
 开始时间：2024-05-05 17:05:22
@@ -282,8 +286,9 @@ sum(Request_count): 0
      count(digest): 1
 [tidb@tidb-server tidb]$ 
 [tidb@tidb-server tidb]$ 
-
-2.2.4 DR Auto-Sync检查
+```
+### 2.2.4 DR Auto-Sync检查
+```
 [tidb@tidb-server tidb]$ mt dr tidb-v6
 Need to execute under the tidb user and on tiup host!
 
@@ -336,4 +341,4 @@ Total nodes: 3
     "pause-region-split": "false"
   }
 }
-
+```
