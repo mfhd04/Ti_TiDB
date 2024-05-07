@@ -6,6 +6,7 @@
 # TiDB : v6.5 later
 
 # set -x  
+# set -x  
 
 # basic env
 tiupcmd="/home/tidb/.tiup/bin/tiup"
