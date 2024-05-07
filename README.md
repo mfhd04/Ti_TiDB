@@ -3,22 +3,29 @@ DBA Operation And Maintenance Tool For TiDB Database
 
 
 # 1. 工具使用简介
-## 1.1 配置别名 - [具体路径基于实际情况进行修改]
+## 1.1 配置别名 - [别名及路径基于实际情况进行修改]
 
 alias vi='vim'  
-alias vimt='vi /nas/vm_workdir/MT_TiDB'  
-alias mt='/nas/vm_workdir/MT_TiDB'  
+alias viti='vi /nas/vm_workdir/Ti_TiDB'  
+alias ti='/nas/vm_workdir/Ti_TiDB'  
 
 ## 1.2 设置数据库连接
-  MT_TiDB为一个shell脚本，直接编辑修改，修改开始部分的数据库连接信息
+  Ti_TiDB为一个shell脚本，直接编辑修改，修改开始部分的数据库连接信息
 ![image](https://github.com/mfhd04/MT_TiDB/assets/68178811/3dad52f0-36c6-4bdc-ab41-31e25cf0b23c)
 
 
 ## 1.3 验证配置
  修改相关必要变量后，通过如下命令验证工具和数据库集群连通性。
- $ mt test
-<img width="567" alt="image" src="https://github.com/mfhd04/MT_TiDB/assets/68178811/f7ad15a8-3ada-4ed9-be23-7605b11a8ffd">
-
+ $ ti test
+```
+[root@tidb-server vm_workdir]# ti test
++---------------------+--------------------+
+| SYSDATE()           | version()          |
++---------------------+--------------------+
+| 2024-05-07 15:29:56 | 5.7.25-TiDB-v6.5.9 |
++---------------------+--------------------+
+[root@tidb-server vm_workdir]# 
+```
      
 ## 1.4 特别说明：
   - 部分菜单功能需要基于tiup环境才可以正常使用，建议该工具部署在可以直接调用tiup命令的用户下，如tidb用户
@@ -27,7 +34,7 @@ alias mt='/nas/vm_workdir/MT_TiDB'
 # 2. 功能明细
 ## 2.1 工具菜单
 ```
-[tidb@tidb-server tidb]$ mt
+[tidb@tidb-server tidb]$ ti
 
   Usage: mt <command> [<arguments>]
   e.g. : mt test
@@ -131,7 +138,7 @@ alias mt='/nas/vm_workdir/MT_TiDB'
 ## 2.2 功能演示
 ### 2.2.1 基本信息
 ```
-[tidb@tidb-server tidb]$ mt basic
+[tidb@tidb-server tidb]$ ti basic
 +---------------------+--------------------+
 | SYSDATE()           | version()          |
 +---------------------+--------------------+
@@ -239,7 +246,7 @@ Threads: 0  Questions: 0  Slow queries: 0  Opens: 0  Flush tables: 0  Open table
 
 ### 2.2.3 Tikv top cpu
 ```
-[tidb@tidb-server tidb]$ mt top_tikv_cpu_sql
+[tidb@tidb-server tidb]$ ti top_tikv_cpu_sql
 请输入开始时间（留空则默认为半小时前:2024-05-05 17:05:21）: 
 开始时间：2024-05-05 17:05:22
 请输入结束时间（留空则默认为当前时间:2024-05-05 17:35:22）: 
@@ -281,7 +288,7 @@ sum(Request_count): 0
 ```
 ### 2.2.4 DR Auto-Sync检查
 ```
-[tidb@tidb-server tidb]$ mt dr tidb-v6
+[tidb@tidb-server tidb]$ ti dr tidb-v6
 Need to execute under the tidb user and on tiup host!
 
 ==================================== The PD Member Status ====================================
