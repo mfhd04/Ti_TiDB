@@ -4,11 +4,10 @@ DBA Operation And Maintenance Tool For TiDB Database
 
 # 1. 工具使用简介
 ## 1.1 配置别名 - [别名及路径基于实际情况进行修改]
-
-alias vi='vim'  
+```
 alias viti='vi /nas/vm_workdir/Ti_TiDB'  
 alias ti='/nas/vm_workdir/Ti_TiDB'  
-
+```
 ## 1.2 设置数据库连接
   Ti_TiDB为一个shell脚本，直接编辑修改，修改开始部分的数据库连接信息
 ![image](https://github.com/mfhd04/MT_TiDB/assets/68178811/3dad52f0-36c6-4bdc-ab41-31e25cf0b23c)
