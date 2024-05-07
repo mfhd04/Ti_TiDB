@@ -11,14 +11,6 @@ alias mt='/nas/vm_workdir/MT_TiDB'
 
 ## 1.2 设置数据库连接
   MT_TiDB为一个shell脚本，直接编辑修改，修改开始部分的数据库连接信息
-简单加密逻辑：
-如明文密码为'root'
-通过base64加密
-[root@vm172-16-201-85 ~]# echo -n 'root'|base64
-cm9vdA==
-[root@vm172-16-201-85 ~]# 
-
-cm9vdA== 替换MYPASS中的"cjAwdEAxMzE0"即可
 ![image](https://github.com/mfhd04/MT_TiDB/assets/68178811/3dad52f0-36c6-4bdc-ab41-31e25cf0b23c)
 
 
