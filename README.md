@@ -21,7 +21,6 @@ alias ti='/nas/vm_workdir/Ti_TiDB'
 # TiDB : v6.5 later
 
 # set -x  
-# set -x  
 
 # basic env
 tiupcmd="/home/tidb/.tiup/bin/tiup"
