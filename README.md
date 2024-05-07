@@ -9,8 +9,32 @@ alias viti='vi /nas/vm_workdir/Ti_TiDB'
 alias ti='/nas/vm_workdir/Ti_TiDB'  
 ```
 ## 1.2 设置数据库连接
-  Ti_TiDB为一个shell脚本，直接编辑修改，修改开始部分的数据库连接信息
-![image](https://github.com/mfhd04/MT_TiDB/assets/68178811/3dad52f0-36c6-4bdc-ab41-31e25cf0b23c)
+  Ti_TiDB为一个shell脚本，初次使用，需要配置数据库的连接信息，直接编辑脚本修改，修改开始部分的数据库连接信息
+
+```
+[root@tidb-server vm_workdir]# viti
+#!/bin/bash
+#
+# Copyright (c) 2024, 2099, M  All rights reserved.
+# Author:  mfhd04@163.com  
+# OS    : X86 
+# TiDB : v6.5 later
+
+# set -x  
+# set -x  
+
+# basic env
+tiupcmd="/home/tidb/.tiup/bin/tiup"
+
+# Connection information
+MYPATH="/bin/mysql"
+MYUSER="root"
+MYPASS=$(echo -n 'cjAwdEAxMzE0'| base64 --decode)
+MYHOST="10.0.0.89"
+MYPORT="4000"
+
+```
+
 
 
 ## 1.3 验证配置
