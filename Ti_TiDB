@@ -62,7 +62,7 @@ usage()
       - tab_idx_col_dup                                                       Display the index information with duplicate columns
       - tab_idx  | index <database_name> <table_name>                         Display table indexes information
       - tab_info <database_name> <table_name>                                 Display table information, including attributes、indexes、columns、and create statements     
-      - tab_size                                                              Display the table or index size
+      - tab_size | ts <db_name> <table_name>                                  Display the table or index size
       - db_size                                                               Display the spescial db or all db size
       - tab_region_dist <database_name> <table_name>                          Display the table and index region distribute
       - tab_region_leader <database_name> <table_name>                        Display the table and index region leader distribute
@@ -86,21 +86,21 @@ usage()
       - hot_read_write                                                        Display the Current Hot table through information_schema.tidb_hot_regions
       - hot_tikv_store                                                        Display the Current Hot tikv store through information_schema.tidb_hot_regions
       
-      - sql_diag_analysis                                                     SQL diagnosis and output related information
+      - sql_diag_analysis | sda <sql digest>                                  SQL diagnosis and output related information
       - sql_plan_change                                                       Display the SQL List which Plan change at during special time;
-      - sql_slow_exec_hist                                                    Display the slow query SQL execute history changes
-      - sql_full_scan                                                         Display the full table scan SQL
-      - sql_slow_long                                                         Display the slow query SQL long query time
-      - sql_exec_detail                                                       Obtain the execution status of the specified SQL digest in the statement summary
+      - sql_slow_exec_hist | sseh  <sql digest>                               Display the slow query SQL execute history changes
+      - sql_full_scan                                                         Display the full table scan SQL for the special time;
+      - sql_slow_long                                                         Display the slow query SQL long query time for the special time;
+      - sql_exec_detail | sed  <sql digest>                                   Obtain the execution status of the specified SQL digest in the statement summary
       - sql_search_text                                                       Find SQL statements containing specific text from a slow query and INFORMATION_SCHEMA.CLUSTER_STATEMENTS_SUMMARY
-      - sql_search_digest                                                     Find SQL statements containing specific sql digest from a slow query and INFORMATION_SCHEMA.CLUSTER_STATEMENTS_SUMMARY
+      - sql_search_digest | ssd <sql digest>                                  Find SQL statements containing specific sql digest from a slow query and INFORMATION_SCHEMA.CLUSTER_STATEMENTS_SUMMARY
       - sql_binding                                                           List All sql binding information from mysql.bind_info
       - sql_binding_filter | sql_binding_filter[ or sbw] <key_word>           List All sql binding information from mysql.bind_info,filter with the original sql text key words
       - sql_binding_enable_stmt                                               Enable the binding by the SQL Statement
       - sql_binding_disable_stmt                                              Disable the binding by the SQL Statement
       - sql_binding_enable_digest    | above v7.1.x                           Enable the binding by the SQL Digest
       - sql_binding_disable_digest   | above v7.1.x                           Disable the binding by the SQL Digest
-      - sql_text | text                                                       Display the SQL Text through the SQL digest
+      - sql_text | text  <sql digest>                                         Display the SQL Text through the SQL digest
 
       - dbstatus                                                              Obtain the current status of the database, including active sessions, token limit configuration, transaction blocking, and top slow queries in the past 30 minutes
       - active_sess_simple                                                    Display the active sessions Parts
@@ -418,7 +418,7 @@ if [ "$1" = "active_sess_simple" -o "$1" = "ass" ]; then
     echo ''
     echo ''
     echo '============================================== Active Session List ============================================='
-    $DBUSER -e 2>/dev/null "select * from information_schema.cluster_processlist where command<>'Sleep' order by 1,3;"
+    $DBUSER -e 2>/dev/null "select instance,id,user,host,db,time,state,digest,mem,disk,txnstart from information_schema.cluster_processlist where command<>'Sleep' order by 1,3;"
     if [ "$?" -gt "0" ]; then
       echo "Execution Failed!"
     fi
@@ -847,9 +847,14 @@ fi
 
 #############################################################################################
 if [ "$1" = "tab_size" -o "$1" = "ts" ]; then
-
-read -p "Input tab/idx name :" segname
-read -p "Input   dbname :" dbname
+if [ "$2" = "" -o "$3" = "" ]; then
+# 提示用户输入SQL指纹
+  read -p "Input tab/idx name :" segname
+  read -p "Input   dbname :" dbname
+else
+   dbname=$2
+   segname=$3
+fi
 
    if [ ! -n "$segname" ]; then
         echo "Plz input segname"
@@ -2128,8 +2133,13 @@ fi
 
 #############################################################################################
 if [ "$1" = "sql_slow_exec_hist" -o "$1" = "sseh" ]; then
+if [ "$2" = "" ]; then
 # 提示用户输入SQL指纹
-read -p "请输入SQL指纹: " sql_digest
+  read -p "请输入SQL指纹: " sql_digest
+else
+   sql_digest=$2
+fi
+
 start_time=""
 end_time=""
 # 提示用户输入开始时间，默认为半小时前
@@ -2356,9 +2366,12 @@ fi
 
 #############################################################################################
 if [ "$1" = "sql_text" -o "$1" = "text" ]; then
-
+if [ "$2" = "" ]; then
 # 提示用户输入SQL指纹
-read -p "请输入SQL指纹: " sql_digest
+   read -p "请输入SQL指纹: " sql_digest
+else
+   sql_digest=$2
+fi
 
     $DBUSER -e 2>/dev/null "SELECT tidb_decode_sql_digests('[\"$sql_digest\"]');";
     if [ "$?" -gt "0" ]; then
@@ -2631,12 +2644,17 @@ fi
 
 #############################################################################################
 if [ "$1" = "sql_diag_analysis" -o "$1" = "sda" ]; then
-read -p "input the sql DIGEST :" digest
+if [ "$2" = "" ]; then
+# 提示用户输入SQL指纹
+   read -p "input the sql DIGEST :" digest
+else
+   digest=$2
+fi
 
 sqldate=`date +%Y%m%d%H%M%S`
 tab_names_file=tab_names_file_`date +%Y%m%d%H%M%S`.txt
 tab_names=/tmp/${tab_names_file} 
-sqlonekeyinfo_file=sqlonekeyinfo_$digest_`date +%Y%m%d%H%M%S`.txt
+sqlonekeyinfo_file=sda_$digest_`date +%Y%m%d%H%M%S`.txt
 sqlonekeyinfo=/tmp/${sqlonekeyinfo_file} 
  
 # echo   "sqlonekeyinfo file :" $sqlonekeyinfo
@@ -2644,17 +2662,12 @@ sqlonekeyinfo=/tmp/${sqlonekeyinfo_file}
 sqlcommand="SELECT SUMMARY_BEGIN_TIME as begin_time,SUMMARY_END_TIME as end_time,PLAN_DIGEST,EXEC_COUNT as execs ,AVG_RESULT_ROWS as avg_rows,
 AVG_LATENCY/1000000000 as avg_ela,AVG_PROCESSED_KEYS as avg_pro_key from INFORMATION_SCHEMA.CLUSTER_STATEMENTS_SUMMARY
 WHERE DIGEST='"${digest}"' or
-(substr(DIGEST,1,5) = substr('"${digest}"',1,5)
- and  substr(DIGEST,31,4) = substr('"${digest}"',6,4)
- and  substr(DIGEST,61,4)= substr('"${digest}"',10,4) )
 UNION
 SELECT SUMMARY_BEGIN_TIME as begin_time,SUMMARY_END_TIME as end_time,PLAN_DIGEST,EXEC_COUNT as execs ,AVG_RESULT_ROWS as avg_rows,
 AVG_LATENCY/1000000000 as avg_ela,AVG_PROCESSED_KEYS as avg_pro_key
 FROM INFORMATION_SCHEMA.cluster_statements_summary_history
-WHERE DIGEST='"${digest}"' or
-(substr(DIGEST,1,5) = substr('"${digest}"',1,5)
- and  substr(DIGEST,31,4) = substr('"${digest}"',6,4)
- and  substr(DIGEST,61,4)= substr('"${digest}"',10,4) ) order by begin_time"
+WHERE DIGEST='"${digest}"' 
+order by begin_time"
 
 echo "========= SQL HIST =========" >> $sqlonekeyinfo
 $DBUSER -e 2>/dev/null "$sqlcommand" -t >> $sqlonekeyinfo
@@ -2722,7 +2735,7 @@ USERNAME=`whoami`
 echo "========= tab statistics information ========="  
 $DBUSER -e 2>/dev/null "$sqlcmd_tabstatus2" -t  
 echo "========= col information ========="  
-$DBUSER -e 2>/dev/null"$sqlcmd_tabstatus3" -t  
+$DBUSER -e 2>/dev/null "$sqlcmd_tabstatus3" -t  
 echo "========= index information ========="  
 $DBUSER -e 2>/dev/null "$sqlcmd_tabstatus4" -t  
 echo "========= tab ddl information ========="  
@@ -2781,9 +2794,15 @@ fi
 
 #############################################################################################
 if [ "$1" = "sql_exec_detail" -o "$1" = "sed" ]; then
-  read -p "input the sql DIGEST :" v_sql_id
-  echo '======================================== SQL Execution Detail Part1 ========================================'
-  $DBUSER -e 2>/dev/null "SELECT first_seen,last_seen,PLAN_DIGEST,EXEC_COUNT as execs ,AVG_RESULT_ROWS as avg_rows,
+if [ "$2" = "" ]; then
+# 提示用户输入SQL指纹
+   read -p "input the sql DIGEST :" v_sql_id
+else
+   v_sql_id=$2
+fi
+
+echo '======================================== SQL Execution Detail Part1 ========================================'
+$DBUSER -e 2>/dev/null "SELECT first_seen,last_seen,PLAN_DIGEST,EXEC_COUNT as execs ,AVG_RESULT_ROWS as avg_rows,
 AVG_LATENCY/1000000000 as avg_ela,AVG_PROCESSED_KEYS as avg_pro_key from INFORMATION_SCHEMA.CLUSTER_STATEMENTS_SUMMARY
 WHERE DIGEST='${v_sql_id}' 
 UNION
@@ -2798,9 +2817,9 @@ limit 5;";
   fi
   $ECHO
   
-  echo ''
-  echo ''
-  echo '======================================== SQL Execution Detail Part1 ========================================'
+echo ''
+echo ''
+echo '======================================== SQL Execution Detail Part2 ========================================'
   $DBUSER -e 2>/dev/null "select  
 plan,
 plan_digest,
@@ -2831,8 +2850,12 @@ fi
 
 #############################################################################################
 if [ "$1" = "sql_search_text" -o "$1" = "sst" ]; then
-
-read -p "input the sqltext other key words:" v_sqltext
+if [ "$2" = "" ]; then
+# 提示用户输入SQL指纹
+   read -p "input the sqltext other key words:" v_sqltext
+else
+   v_sqltext=$2
+fi
 
 start_time=""
 end_time=""
@@ -2902,8 +2925,12 @@ fi
 
 #############################################################################################
 if [ "$1" = "sql_search_digest" -o "$1" = "ssd" ]; then
-
-read -p "input the sql digest :" v_digest
+if [ "$2" = "" ]; then
+# 提示用户输入SQL指纹
+   read -p "input the sql digest :" v_digest
+else
+   v_digest=$2
+fi
 
 start_time=""
 end_time=""
