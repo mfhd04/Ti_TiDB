@@ -1,4 +1,4 @@
-# MT_TiDB
+# Ti
 DBA Operation And Maintenance Tool For TiDB Database
 
 
